@@ -1,0 +1,12 @@
+*.exe
+*.amx
+*.dll
+*.ico
+samp-license.txt
+server-readme.txt
+settings.ini
+samples/
+npcmodes/samples/
+scriptfiles/samples
+server_log.txt
+crashinfo.txt
