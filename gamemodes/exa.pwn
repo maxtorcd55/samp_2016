@@ -9,23 +9,8 @@
 #include "../include/exa_speedometer.pwn"
 
 new Float:mapIcons[100][5];
-enum needs
-{
-	Float:food,
-	Float:drink,
-	Float:pee,
-	Float:poo,
-	Float:energy,
-	Float:hygiene,
-	Float:fun
-
-};
-
 new ActivePlayerNeeds = 0;
-
-
-new playerNeeds[MAX_PLAYERS][needs];
-
+new Float:playerNeeds[MAX_PLAYERS][6];
 new PlayerText:needShow[6][3][10];
 #if defined FILTERSCRIPT
 
@@ -101,7 +86,7 @@ public OnGameModeInit()
 	CreateObject(2818, 256.96201, -40.896, 1001.033, 0, 0, 0);//object (gb_bedrug02) (1)
 
 
-	SetTimer("needsTimer", 10, true);
+	SetTimer("needsTimer", 1, true);
 
 
 
@@ -113,104 +98,49 @@ public needsTimer()
 {
 	new plyid = ActivePlayerNeeds;
 	ActivePlayerNeeds++;
-	if(ActivePlayerNeeds > 100){ActivePlayerNeeds = 0;}
+	if(ActivePlayerNeeds > 5){ActivePlayerNeeds = 0;}
 	if(IsPlayerConnected(plyid))
 	{
 		new Float: health=100.0;
 		GetPlayerHealth(plyid,health);
-	    playerNeeds[plyid][food] -= 0.3;
-		playerNeeds[plyid][drink] -= 0.7;
-		playerNeeds[plyid][pee] -= 0.5;
-		playerNeeds[plyid][poo] -= 0.1;
-		playerNeeds[plyid][energy] -= 0.08;
-		playerNeeds[plyid][hygiene] -= 0.06;
 
-		if(playerNeeds[plyid][food] < 0){playerNeeds[plyid][food]=0.0;health-=1.0;}
-		if(playerNeeds[plyid][drink] < 0){playerNeeds[plyid][drink]=0.0;health-=2.0;}
-		if(playerNeeds[plyid][pee] < 0){playerNeeds[plyid][pee]=100.0;playerNeeds[plyid][hygiene]-=70.0;}
-		if(playerNeeds[plyid][poo] < 0){playerNeeds[plyid][poo]=100.0;playerNeeds[plyid][hygiene]-=85.0;}
-		if(playerNeeds[plyid][energy] < 0){playerNeeds[plyid][energy]+=5.0;ApplyAnimation(plyid,  "INT_HOUSE", "BED_Loop_L", 4.1, 1, 1, 1, 0, 7000, 0);}
-		if(playerNeeds[plyid][hygiene] < 0){playerNeeds[plyid][hygiene]=0.0;health-=0.5;}
-		SetPlayerHealth(plyid,health);
+	    playerNeeds[plyid][0] -= 0.3;
+		playerNeeds[plyid][1] -= 0.7;
+		playerNeeds[plyid][2] -= 0.5;
+		playerNeeds[plyid][3] -= 0.1;
+		playerNeeds[plyid][4] -= 0.08;
+		playerNeeds[plyid][5] -= 0.06;
 
-		if(playerNeeds[plyid][food] > 100.0){playerNeeds[plyid][food] = 100.0;}
-		if(playerNeeds[plyid][drink] > 100.0){playerNeeds[plyid][drink] = 100.0;}
-		if(playerNeeds[plyid][pee] > 100.0){playerNeeds[plyid][pee] = 100.0;}
-		if(playerNeeds[plyid][poo] > 100.0){playerNeeds[plyid][poo] = 100.0;}
-		if(playerNeeds[plyid][energy] > 100.0){playerNeeds[plyid][energy] = 100.0;}
-		if(playerNeeds[plyid][hygiene] > 100.0){playerNeeds[plyid][hygiene] = 100.0;}
+		if(playerNeeds[plyid][0] < 0){playerNeeds[plyid][0]=0.0;health-=1.0;}
+		if(playerNeeds[plyid][1] < 0){playerNeeds[plyid][1]=0.0;health-=2.0;}
+		if(playerNeeds[plyid][2] < 0){playerNeeds[plyid][2]=100.0;playerNeeds[plyid][5]-=70.0;}
+		if(playerNeeds[plyid][3] < 0){playerNeeds[plyid][3]=100.0;playerNeeds[plyid][5]-=85.0;}
+		if(playerNeeds[plyid][4] < 0){playerNeeds[plyid][4]+=5.0;ApplyAnimation(plyid,  "INT_HOUSE", "BED_Loop_L", 4.1, 1, 1, 1, 0, 7000, 0);}
+		if(playerNeeds[plyid][5] < 0){playerNeeds[plyid][5]=0.0;health-=0.5;}
+		//SetPlayerHealth(plyid,health);
 
-		for(new need=0; need<6; need++)
+		new needName[][] = {"food","drink","pee","poo","energy","hygiene"};
+		new freeTextDraw = 0;
+		for(new need=0; need<=5; need++)
 		{
 		    for(new cols=0; cols<3; cols++)
 			{
             	PlayerTextDrawHide(plyid, needShow[need][cols][plyid]);
             }
+
+			if(playerNeeds[plyid][need] > 100.0){playerNeeds[plyid][need] = 100.0;}
+			if(playerNeeds[plyid][need] < 30.0)
+			{
+				PlayerTextDrawTextSize(plyid, needShow[freeTextDraw][2][plyid], 497+(99*(playerNeeds[plyid][need]/100)), 480.0);
+				PlayerTextDrawSetString(plyid, needShow[freeTextDraw][2][plyid], needName[need]);
+				for(new cols=0; cols<3; cols++)
+				{
+					PlayerTextDrawShow(plyid, needShow[freeTextDraw][cols][plyid]);
+				}
+				freeTextDraw++;
+			}
+
         }
-        new freeTextDraw = 0;
-
-		if(playerNeeds[plyid][food] < 30.0)
-	 	{
-            PlayerTextDrawTextSize(plyid, needShow[freeTextDraw][2][plyid], 501+(103*(playerNeeds[plyid][food]/100)), 480.0);
-            PlayerTextDrawSetString(plyid, needShow[freeTextDraw][2][plyid], "food");
-			for(new cols=0; cols<3; cols++)
-			{
-            	PlayerTextDrawShow(plyid, needShow[freeTextDraw][cols][plyid]);
-            }
-            freeTextDraw++;
-	 	}
-		if(playerNeeds[plyid][drink] < 30.0)
-	 	{
-            PlayerTextDrawTextSize(plyid, needShow[freeTextDraw][2][plyid], 501+(103*(playerNeeds[plyid][drink]/100)), 480.0);
-            PlayerTextDrawSetString(plyid, needShow[freeTextDraw][2][plyid], "drink");
-			for(new cols=0; cols<3; cols++)
-			{
-            	PlayerTextDrawShow(plyid, needShow[freeTextDraw][cols][plyid]);
-            }
-            freeTextDraw++;
-	 	}
-		if(playerNeeds[plyid][pee] < 30.0)
-	 	{
-            PlayerTextDrawTextSize(plyid, needShow[freeTextDraw][2][plyid], 501+(103*(playerNeeds[plyid][pee]/100)), 480.0);
-            PlayerTextDrawSetString(plyid, needShow[freeTextDraw][2][plyid], "pee");
-            for(new cols=0; cols<3; cols++)
-			{
-            	PlayerTextDrawShow(plyid, needShow[freeTextDraw][cols][plyid]);
-            }
-            freeTextDraw++;
-	 	}
-		if(playerNeeds[plyid][poo] < 30.0)
-	 	{
-            PlayerTextDrawTextSize(plyid, needShow[freeTextDraw][2][plyid], 501+(103*(playerNeeds[plyid][poo]/100)), 480.0);
-            PlayerTextDrawSetString(plyid, needShow[freeTextDraw][2][plyid], "poo");
-            for(new cols=0; cols<3; cols++)
-			{
-            	PlayerTextDrawShow(plyid, needShow[freeTextDraw][cols][plyid]);
-            }
-            freeTextDraw++;
-	 	}
-		if(playerNeeds[plyid][energy] < 30.0)
-	 	{
-            PlayerTextDrawTextSize(plyid, needShow[freeTextDraw][2][plyid], 501+(103*(playerNeeds[plyid][energy]/100)), 480.0);
-            PlayerTextDrawSetString(plyid, needShow[freeTextDraw][2][plyid], "energy");
-            for(new cols=0; cols<3; cols++)
-			{
-            	PlayerTextDrawShow(plyid, needShow[freeTextDraw][cols][plyid]);
-            }
-            freeTextDraw++;
-	 	}
-		if(playerNeeds[plyid][hygiene] < 30.0)
-	 	{
-            PlayerTextDrawTextSize(plyid, needShow[freeTextDraw][2][plyid], 501+(103*(playerNeeds[plyid][hygiene]/100)), 480.0);
-            PlayerTextDrawSetString(plyid, needShow[freeTextDraw][2][plyid], "hygiene");
-            for(new cols=0; cols<3; cols++)
-			{
-            	PlayerTextDrawShow(plyid, needShow[freeTextDraw][cols][plyid]);
-            }
-            freeTextDraw++;
-	 	}
-
-
 
 
 
@@ -288,6 +218,7 @@ public OnPlayerConnect(playerid)
 		PlayerTextDrawUseBox(playerid, needShow[need][0][playerid], 1);
 	    PlayerTextDrawBoxColor(playerid, needShow[need][0][playerid], 0x000000AA);
 	    PlayerTextDrawShow(playerid, needShow[need][0][playerid]);
+		PlayerTextDrawSetShadow(playerid, needShow[need][0][playerid], 0);
 
     	needShow[need][1][playerid] = CreatePlayerTextDraw(playerid, 501.0,112.5+(need*20), "_");
 		PlayerTextDrawTextSize(playerid, needShow[need][1][playerid], 604.2, 480.0);
@@ -295,6 +226,7 @@ public OnPlayerConnect(playerid)
 		PlayerTextDrawUseBox(playerid, needShow[need][1][playerid], 1);
 	    PlayerTextDrawBoxColor(playerid, needShow[need][1][playerid], 0xCC0000AA);
 	    PlayerTextDrawShow(playerid, needShow[need][1][playerid]);
+		PlayerTextDrawSetShadow(playerid, needShow[need][1][playerid], 0);
 
 		needShow[need][2][playerid] = CreatePlayerTextDraw(playerid, 501.0,112.5+(need*20), "_");
 		PlayerTextDrawTextSize(playerid, needShow[need][2][playerid], 504.2, 480.0);
@@ -302,10 +234,9 @@ public OnPlayerConnect(playerid)
 		PlayerTextDrawUseBox(playerid, needShow[need][2][playerid], 1);
 	    PlayerTextDrawBoxColor(playerid, needShow[need][2][playerid], 0xFF0000AA);
 	    PlayerTextDrawShow(playerid, needShow[need][2][playerid]);
+		PlayerTextDrawSetShadow(playerid, needShow[need][2][playerid], 0);
 
-		printf("need: %d", needShow[need][0][playerid]);
-		printf("need: %d", needShow[need][1][playerid]);
-		printf("need: %d", needShow[need][2][playerid]);
+
 	}
 
 	createSpeedoMeter(playerid);
@@ -398,13 +329,13 @@ public OnPlayerCommandText(playerid, cmdtext[])
 
 	if (strcmp("/food", cmd, true, 10) == 0)
 	{
-		playerNeeds[playerid][food] += 50.0;
+		playerNeeds[playerid][0] += 50.0;
 		SendClientMessage(playerid, -1, "food+");
 		return 1;
 	}
 	if (strcmp("/sleep", cmd, true, 10) == 0)
 	{
-		playerNeeds[playerid][energy] += 50.0;
+		playerNeeds[playerid][4] += 50.0;
 		SendClientMessage(playerid, -1, "energy+");
 		return 1;
 	}
@@ -514,21 +445,22 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 {
 	if(newkeys == KEY_YES)
 	{
+		//{"food","drink","pee","poo","energy","hygiene"};
        	if(IsPlayerInRangeOfPoint(playerid, 0.5, 258.7220,-41.7669,1002.0333))
 	    {
-            playerNeeds[playerid][hygiene] += 10.0;
-            playerNeeds[playerid][drink] += 25.0;
+            playerNeeds[playerid][4] += 10.0;
+            playerNeeds[playerid][1] += 25.0;
             SendClientMessage(playerid, -1, "hygiene+\ndrink+");
 	    }
 	    else if(IsPlayerInRangeOfPoint(playerid, 0.5, 257.7963,-39.9567,1002.0333))
 	    {
-            playerNeeds[playerid][hygiene] += 100.0;
+            playerNeeds[playerid][4] += 100.0;
             SendClientMessage(playerid, -1, "hygiene++");
 	    }
 	    else if(IsPlayerInRangeOfPoint(playerid, 0.5,  254.8486,-39.8989,1002.0333))
 	    {
-            playerNeeds[playerid][pee] += 100.0;
-            playerNeeds[playerid][poo] += 100.0;
+            playerNeeds[playerid][2] += 100.0;
+            playerNeeds[playerid][3] += 100.0;
             SendClientMessage(playerid, -1, "pee++\npoo++");
 	    }
 	    SendClientMessage(playerid, -1, "kry press");
@@ -647,11 +579,11 @@ stock numberToStipes(Float: num)
 
 stock resetNeeds(plyid)
 {
-    playerNeeds[plyid][food] = 100.0;
-	playerNeeds[plyid][drink] = 100.0;
-	playerNeeds[plyid][pee] = 100.0;
-	playerNeeds[plyid][poo] = 100.0;
-	playerNeeds[plyid][energy] = 100.0;
-	playerNeeds[plyid][hygiene] = 100.0;
+    playerNeeds[plyid][0] = 100.0;
+	playerNeeds[plyid][1] = 100.0;
+	playerNeeds[plyid][2] = 100.0;
+	playerNeeds[plyid][3] = 100.0;
+	playerNeeds[plyid][4] = 100.0;
+	playerNeeds[plyid][5] = 100.0;
 	return 1;
 }
