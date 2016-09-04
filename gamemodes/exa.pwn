@@ -6,6 +6,7 @@
 #include <a_samp>
 #include <sscanf>
 #include <Thread>
+#include "../include/exa_speedometer.pwn"
 
 new Float:mapIcons[100][5];
 enum needs
@@ -45,24 +46,9 @@ main()
 
 #endif
 
-new count = 0;
-
-forward thTest( threadid );
-public thTest( threadid )
-{
-	new kaas = LockThread(threadid);
-	printf("%d",count++);
-    SleepThread( 100000 );
-
-    UnLockThread( kaas );
-
-}
-
 
 public OnGameModeInit()
 {
-
-    CreateThread("thTest");
 
 	//xdfds
 
@@ -314,6 +300,7 @@ public OnPlayerConnect(playerid)
 		printf("need: %d", needShow[need][2][playerid]);
 	}
 
+	createSpeedoMeter(playerid);
 	return 1;
 }
 
