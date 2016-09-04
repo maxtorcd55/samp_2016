@@ -7,8 +7,9 @@
 #include <sscanf>
 #include <Thread>
 #include "../include/exa_speedometer.pwn"
+#include "../include/quicksort.pwn"
+#include "../include/binarysearch.pwn"
 
-new Float:mapIcons[100][5];
 enum needs
 {
 	Float:food,
@@ -21,12 +22,15 @@ enum needs
 
 };
 
+new Float:mapIcons[100][5];
 new ActivePlayerNeeds = 0;
-
-
 new playerNeeds[MAX_PLAYERS][needs];
-
 new PlayerText:needShow[6][3][10];
+new maxPlayers;
+new connectedPlayers = 0;
+new players[MAX_PLAYERS] = {MAX_PLAYERS,...};
+new maxPlayersRight = MAX_PLAYERS-1;
+
 #if defined FILTERSCRIPT
 
 
@@ -53,7 +57,7 @@ main()
 
 public OnGameModeInit()
 {
-
+	maxPlayers = GetMaxPlayers();
 	//xdfds
 
 
@@ -102,9 +106,25 @@ public OnGameModeInit()
 
 
 	SetTimer("needsTimer", 10, true);
+	SetTimer("onTimer300", 300/maxPlayers, true);
 
 
 
+	return 1;
+}
+
+forward onTimer300();
+public onTimer300()
+{
+	static timer300Index = 0;
+	if (IsPlayerConnected(timer300Index)) {
+		speedoUpdate(timer300Index);
+	}
+	if (timer300Index == maxPlayers){
+		timer300Index = 0;
+	} else {
+		timer300Index++;
+	}
 	return 1;
 }
 
@@ -255,6 +275,13 @@ public OnPlayerRequestClass(playerid, classid)
 
 public OnPlayerConnect(playerid)
 {
+	/* track players */
+	players[connectedPlayers] = playerid;
+	connectedPlayers++;
+	quickSortAsc(players, 0, maxPlayersRight);
+	printf("added player: %i, %i players total", playerid, connectedPlayers);
+	/* track players */
+
     resetNeeds(playerid);
 	SetPlayerMapIcon(playerid, 0, 2816.40625, 2132.8125, 0, 31, 0, MAPICON_LOCAL);
 	SetPlayerMapIcon(playerid, 1, 2367.1875, 2160.15625, 0, 31, 0, MAPICON_LOCAL);
@@ -314,6 +341,17 @@ public OnPlayerConnect(playerid)
 
 public OnPlayerDisconnect(playerid, reason)
 {
+	/* track players */
+	new playerindex = binarySearch(players, MAX_PLAYERS, playerid);
+	if (playerindex == -1) {
+		print("[ERROR] binarySearch failed");
+	} else {
+		players[playerindex] = MAX_PLAYERS;
+	}
+	connectedPlayers--;
+	quickSortAsc(players, 0, maxPlayersRight);
+	printf("removed player: %i from index %i, %i players remaining", playerid, playerindex, connectedPlayers);
+	/* track players */
 
 	return 1;
 }
