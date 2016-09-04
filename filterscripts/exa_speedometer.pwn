@@ -37,7 +37,6 @@ main()
 
 public OnPlayerConnect(playerid)
 {
-
 	SpeedoMeter[playerid] = TextDrawCreate(530.0,380.0, " ");
 	TextDrawTextSize(SpeedoMeter[playerid], 620.0, 480.0);
 	TextDrawLetterSize(SpeedoMeter[playerid],0.3,1.0);
@@ -45,6 +44,8 @@ public OnPlayerConnect(playerid)
 	//TextDrawTextSize(SpeedoMeter[playerid], 20.1, 20.1);
 	TextDrawUseBox(SpeedoMeter[playerid], 1);
     TextDrawBoxColor(SpeedoMeter[playerid], 0x000000AA);
+
+	printf("speed: %d",SpeedoMeter[playerid]);
 	return 1;
 }
 
@@ -66,8 +67,8 @@ public OnGameModeInit()
 {
     //SetTimer("SpeedoUpdate", 200, false);
 
-    
-    
+
+
 	return 1;
 }
 
@@ -100,16 +101,16 @@ public SpeedoUpdate(threadid)
 			{
 			    TextDrawHideForPlayer(i, SpeedoMeter[i]);
 			}
-            
 
-    
+
+
 		}
     }
-    
 
-    
+
+
     //SetTimer("SpeedoUpdate", floatround(200+(PlayersOnline*70), floatround_round), false);
-    SleepThread( 100 );
+    SleepThread( 20 );
     UnLockThread( kaas );
 }
 
@@ -123,9 +124,6 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		return 1;
 	}
 
-	
+
 	return 0;
 }
-
-
-

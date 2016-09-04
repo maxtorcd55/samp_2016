@@ -20,7 +20,8 @@ enum needs
 
 };
 new playerNeeds[MAX_PLAYERS][needs];
-new Text:needShow[6][3][MAX_PLAYERS];
+
+new Text:needShow[6][3][10];
 #if defined FILTERSCRIPT
 
 
@@ -45,26 +46,26 @@ main()
 #endif
 
 new count = 0;
-new thread1;
-new thread2;
+
 forward thTest( threadid );
 public thTest( threadid )
 {
 	new kaas = LockThread(threadid);
 	printf("%d",count++);
-    SleepThread( 1000 );
+    SleepThread( 100000 );
 
     UnLockThread( kaas );
 
 }
 
 
-new locth;
 public OnGameModeInit()
 {
 
+    CreateThread("thTest");
 
-    thread1 = CreateThread("thTest");
+	//xdfds
+
 
 	// Don't use these lines if it's a filterscript
 	SetGameModeText("eXa");
@@ -110,7 +111,7 @@ public OnGameModeInit()
 	CreateObject(2818, 256.96201, -40.896, 1001.033, 0, 0, 0);//object (gb_bedrug02) (1)
 
 
-	SetTimer("needsTimer", 70, true);
+	SetTimer("needsTimer", 50, true);
 
 
 
@@ -120,19 +121,19 @@ public OnGameModeInit()
 forward needsTimer();
 public needsTimer()
 {
-    
+
 	for(new plyid=0; plyid < 10; plyid++)
 	{
-	    new Float:health;
-		if(GetPlayerHealth(plyid,health))
+		if(IsPlayerConnected(plyid))
 		{
+			new Float: health=0.0;
 		    playerNeeds[plyid][food] -= 0.1;
 			playerNeeds[plyid][drink] -= 0.7;
 			playerNeeds[plyid][pee] -= 0.5;
 			playerNeeds[plyid][poo] -= 0.05;
 			playerNeeds[plyid][energy] -= 0.04;
 			playerNeeds[plyid][hygiene] -= 0.06;
-			
+
 			if(playerNeeds[plyid][food] < 0){playerNeeds[plyid][food]=0.0;health-=1.0;}
 			if(playerNeeds[plyid][drink] < 0){playerNeeds[plyid][drink]=0.0;health-=2.0;}
 			if(playerNeeds[plyid][pee] < 0){playerNeeds[plyid][pee]=100.0;playerNeeds[plyid][hygiene]-=70.0;}
@@ -147,7 +148,6 @@ public needsTimer()
 			if(playerNeeds[plyid][poo] > 100.0){playerNeeds[plyid][poo] = 100.0;}
 			if(playerNeeds[plyid][energy] > 100.0){playerNeeds[plyid][energy] = 100.0;}
 			if(playerNeeds[plyid][hygiene] > 100.0){playerNeeds[plyid][hygiene] = 100.0;}
-
 			for(new need=0; need<6; need++)
 			{
 			    for(new cols=0; cols<3; cols++)
@@ -156,7 +156,7 @@ public needsTimer()
 	            }
 	        }
 	        new freeTextDraw = 0;
-	        
+
  			if(playerNeeds[plyid][food] < 30.0)
 		 	{
                 TextDrawTextSize(needShow[freeTextDraw][2][plyid], 501+(103*(playerNeeds[plyid][food]/100)), 480.0);
@@ -217,12 +217,12 @@ public needsTimer()
 	            }
                 freeTextDraw++;
 		 	}
-		 	
-
-		    
 
 
-		    
+
+
+
+
 	    	if(IsPlayerInRangeOfPoint(plyid, 6, 258.7220,-41.7669,1002.0333))
 			{
 		       	if(IsPlayerInRangeOfPoint(plyid, 0.5, 258.7220,-41.7669,1002.0333))
@@ -238,8 +238,8 @@ public needsTimer()
 		            GameTextForPlayer(plyid, "Press \"~k~~CONVERSATION_YES~\"", 1100, 3);
 			    }
 			}
-		    
-		    
+
+
 		}
 	}
 
@@ -294,7 +294,7 @@ public OnPlayerConnect(playerid)
 		TextDrawUseBox(needShow[need][0][playerid], 1);
 	    TextDrawBoxColor(needShow[need][0][playerid], 0x000000AA);
 	    TextDrawShowForPlayer(playerid, needShow[need][0][playerid]);
-	    
+
     	needShow[need][1][playerid] = TextDrawCreate(501.0,112.5+(need*20), "_");
 		TextDrawTextSize(needShow[need][1][playerid], 604.2, 480.0);
 		TextDrawLetterSize(needShow[need][1][playerid],0.3,1.0);
@@ -309,6 +309,9 @@ public OnPlayerConnect(playerid)
 	    TextDrawBoxColor(needShow[need][2][playerid], 0xFF0000AA);
 	    TextDrawShowForPlayer(playerid, needShow[need][2][playerid]);
 
+		printf("need: %d", needShow[need][0][playerid]);
+		printf("need: %d", needShow[need][1][playerid]);
+		printf("need: %d", needShow[need][2][playerid]);
 	}
 
 	return 1;
@@ -316,6 +319,12 @@ public OnPlayerConnect(playerid)
 
 public OnPlayerDisconnect(playerid, reason)
 {
+	for(new need=0; need<6; need++)
+	{
+		TextDrawDestroy(needShow[need][0][playerid]);
+		TextDrawDestroy(needShow[need][1][playerid]);
+		TextDrawDestroy(needShow[need][2][playerid]);
+	}
 	return 1;
 }
 
@@ -398,27 +407,6 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		return 1;
 	}
 
-	if (strcmp("/lock", cmd, true, 10) == 0)
-	{
-	    new Hour, Minute, Second, Timestamp;
-		Timestamp = gettime(Hour, Minute, Second);
-		printf("Seconds since midnight 1st January 1970: %d", Timestamp);
-        locth = LockThread(thread1);
-        Timestamp = gettime(Hour, Minute, Second);
-		printf("Seconds since midnight 1st January 1970: %d", Timestamp);
-        
-		return 1;
-	}
-    
-	if (strcmp("/unlock", cmd, true, 10) == 0)
-	{
-        UnLockThread( locth );
-
-		return 1;
-	}
-
-
-    
 
 
 	return 0;
@@ -620,7 +608,7 @@ stock token_by_delim(const string[], return_str[], delim, start_index)
 	if(string[start_index] == EOS) start_index = (-1);
 	return start_index;
 }
-stock IsNumeric(const string[]) //By Jan "DracoBlue" Sch�tze (edited by Gabriel "Larcius" Cordes
+stock IsNumeric(const string[]) //By Jan "DracoBlue" Schï¿½tze (edited by Gabriel "Larcius" Cordes
 {
 	new length=strlen(string);
 	if(length==0)

@@ -127,7 +127,7 @@ public OnPlayerUpdate(playerid)
 stock GetMoveDirectionFromKeys(ud, lr)
 {
 	new direction = 0;
-	
+
     if(lr < 0)
 	{
 		if(ud < 0) 		direction = MOVE_FORWARD_LEFT; 	// Up & Left key pressed
@@ -142,7 +142,7 @@ stock GetMoveDirectionFromKeys(ud, lr)
 	}
 	else if(ud < 0) 	direction = MOVE_FORWARD; 	// Up key pressed
 	else if(ud > 0) 	direction = MOVE_BACK;		// Down key pressed
-	
+
 	return direction;
 }
 
