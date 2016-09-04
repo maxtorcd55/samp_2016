@@ -1,6 +1,5 @@
 *.exe
 *.amx
-*.dll
 *.ico
 samp-license.txt
 server-readme.txt
