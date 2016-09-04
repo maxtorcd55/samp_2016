@@ -308,6 +308,7 @@ public OnPlayerConnect(playerid)
 		printf("need: %d", needShow[need][2][playerid]);
 	}
 
+	createSpeedoMeter(playerid);
 	return 1;
 }
 
