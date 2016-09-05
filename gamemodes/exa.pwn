@@ -7,11 +7,24 @@
 #include <sscanf>
 #include <Thread>
 #include "../include/exa_speedometer.pwn"
+#include "../include/quicksort.pwn"
+#include "../include/binarysearch.pwn"
+
+
+
 
 new Float:mapIcons[100][5];
-new ActivePlayerNeeds = 0;
-new Float:playerNeeds[MAX_PLAYERS][6];
-new PlayerText:needShow[6][3][10];
+new ActivePlayerNeeds = 0; //Welk ply id er wordt verwwerkt
+new Float:playerNeeds[MAX_PLAYERS][6]; //Behoeftes van player
+new PlayerText:needShow[6][3][10]; //Textdraws van Behoeftes
+new toggleNeedsTextDraw[MAX_PLAYERS]; //Aan,uit zetten Behoeftes textdraw
+new lastPlayerKey[MAX_PLAYERS];
+
+new maxPlayers;
+new connectedPlayers = 0;
+new players[MAX_PLAYERS] = {MAX_PLAYERS,...};
+new maxPlayersRight = MAX_PLAYERS-1;
+
 #if defined FILTERSCRIPT
 
 
@@ -38,7 +51,7 @@ main()
 
 public OnGameModeInit()
 {
-
+	maxPlayers = GetMaxPlayers();
 	//xdfds
 
 
@@ -86,52 +99,86 @@ public OnGameModeInit()
 	CreateObject(2818, 256.96201, -40.896, 1001.033, 0, 0, 0);//object (gb_bedrug02) (1)
 
 
-	SetTimer("needsTimer", 1, true);
+
+	SetTimer("needsTimer", 300, true);
+	SetTimer("onTimer300", 300/maxPlayers, true);
+
 
 
 
 	return 1;
 }
 
+forward onTimer300();
+public onTimer300()
+{
+	static timer300Index = 0;
+	if (IsPlayerConnected(timer300Index)) {
+		speedoUpdate(timer300Index);
+	}
+	if (timer300Index == maxPlayers){
+		timer300Index = 0;
+	} else {
+		timer300Index++;
+	}
+	return 1;
+}
+
 forward needsTimer();
 public needsTimer()
 {
+
 	new plyid = ActivePlayerNeeds;
 	ActivePlayerNeeds++;
 	if(ActivePlayerNeeds > 5){ActivePlayerNeeds = 0;}
-	if(IsPlayerConnected(plyid))
+	new playerState = GetPlayerState(plyid);
+	if(IsPlayerConnected(plyid) && (playerState == 1 || playerState == 2 || playerState == 3))//Is player connected and onfoot,driver,PASSENGER
 	{
+
+		new msg[128];
+		format(msg, 128, "Running anim: %d", GetPlayerAnimationIndex(plyid));
+		SendClientMessage(plyid, -1, msg);
+
 		new Float: health=100.0;
 		GetPlayerHealth(plyid,health);
 
-	    playerNeeds[plyid][0] -= 0.3;
-		playerNeeds[plyid][1] -= 0.7;
-		playerNeeds[plyid][2] -= 0.5;
-		playerNeeds[plyid][3] -= 0.1;
-		playerNeeds[plyid][4] -= 0.08;
-		playerNeeds[plyid][5] -= 0.06;
+	    playerNeeds[plyid][0] -= 0.3;//food
+		playerNeeds[plyid][1] -= 0.7;//drink
+		playerNeeds[plyid][2] -= 0.5;//pee
+		playerNeeds[plyid][3] -= 0.1;//poo
+		if(playerState == 1)//Is player onfoot
+		{
+			playerNeeds[plyid][4] -= 0.08;//energy
+			playerNeeds[plyid][5] -= 0.06;//hygiene
+		}
+		else
+		{
+			playerNeeds[plyid][4] -= 0.06;//energy
+			playerNeeds[plyid][5] -= 0.04;//hygiene
+		}
 
-		if(playerNeeds[plyid][0] < 0){playerNeeds[plyid][0]=0.0;health-=1.0;}
-		if(playerNeeds[plyid][1] < 0){playerNeeds[plyid][1]=0.0;health-=2.0;}
-		if(playerNeeds[plyid][2] < 0){playerNeeds[plyid][2]=100.0;playerNeeds[plyid][5]-=70.0;}
-		if(playerNeeds[plyid][3] < 0){playerNeeds[plyid][3]=100.0;playerNeeds[plyid][5]-=85.0;}
+		if(playerNeeds[plyid][0] < 0){playerNeeds[plyid][0]=0.0;health-=1.0;}//food
+		if(playerNeeds[plyid][1] < 0){playerNeeds[plyid][1]=0.0;health-=2.0;}//drink
+		if(playerNeeds[plyid][2] < 0){playerNeeds[plyid][2]=100.0;playerNeeds[plyid][5]-=70.0;}//pee
+		if(playerNeeds[plyid][3] < 0){playerNeeds[plyid][3]=100.0;playerNeeds[plyid][5]-=85.0;}//poo
 		if(playerNeeds[plyid][4] < 0){playerNeeds[plyid][4]+=5.0;ApplyAnimation(plyid,  "INT_HOUSE", "BED_Loop_L", 4.1, 1, 1, 1, 0, 7000, 0);}
 		if(playerNeeds[plyid][5] < 0){playerNeeds[plyid][5]=0.0;health-=0.5;}
-		//SetPlayerHealth(plyid,health);
-
+		SetPlayerHealth(plyid,health);
 		new needName[][] = {"food","drink","pee","poo","energy","hygiene"};
 		new freeTextDraw = 0;
 		for(new need=0; need<=5; need++)
 		{
-		    for(new cols=0; cols<3; cols++)
+
+			for(new cols=0; cols<3; cols++)
 			{
-            	PlayerTextDrawHide(plyid, needShow[need][cols][plyid]);
-            }
+				PlayerTextDrawHide(plyid, needShow[need][cols][plyid]);
+			}
 
 			if(playerNeeds[plyid][need] > 100.0){playerNeeds[plyid][need] = 100.0;}
-			if(playerNeeds[plyid][need] < 30.0)
+			if(playerNeeds[plyid][need] < 30.0 || (lastPlayerKey[plyid] & KEY_NO))
 			{
-				PlayerTextDrawTextSize(plyid, needShow[freeTextDraw][2][plyid], 497+(99*(playerNeeds[plyid][need]/100)), 480.0);
+				toggleNeedsTextDraw[plyid] = 1;
+				PlayerTextDrawTextSize(plyid, needShow[freeTextDraw][2][plyid], 498+(101*(playerNeeds[plyid][need]/100)), 480.0);
 				PlayerTextDrawSetString(plyid, needShow[freeTextDraw][2][plyid], needName[need]);
 				for(new cols=0; cols<3; cols++)
 				{
@@ -139,12 +186,7 @@ public needsTimer()
 				}
 				freeTextDraw++;
 			}
-
         }
-
-
-
-
     	if(IsPlayerInRangeOfPoint(plyid, 6, 258.7220,-41.7669,1002.0333))
 		{
 	       	if(IsPlayerInRangeOfPoint(plyid, 0.5, 258.7220,-41.7669,1002.0333))
@@ -160,10 +202,22 @@ public needsTimer()
 	            GameTextForPlayer(plyid, "Press \"~k~~CONVERSATION_YES~\"", 1100, 3);
 		    }
 		}
-
-
+		toggleNeedsTextDraw[plyid] = 1;
 	}
-
+	else
+	{
+		if(toggleNeedsTextDraw[plyid] == 1)
+		{
+			for(new need=0; need<=5; need++)
+			{
+				for(new cols=0; cols<3; cols++)
+				{
+					PlayerTextDrawHide(plyid, needShow[need][cols][plyid]);
+				}
+			}
+			toggleNeedsTextDraw[plyid] = 0;
+		}
+	}
 
 }
 
@@ -185,6 +239,16 @@ public OnPlayerRequestClass(playerid, classid)
 
 public OnPlayerConnect(playerid)
 {
+
+	toggleNeedsTextDraw[playerid] = 1;
+
+	/* track players */
+	players[connectedPlayers] = playerid;
+	connectedPlayers++;
+	quickSortAsc(players, 0, maxPlayersRight);
+	printf("added player: %i, %i players total", playerid, connectedPlayers);
+	/* track players */
+
     resetNeeds(playerid);
 	SetPlayerMapIcon(playerid, 0, 2816.40625, 2132.8125, 0, 31, 0, MAPICON_LOCAL);
 	SetPlayerMapIcon(playerid, 1, 2367.1875, 2160.15625, 0, 31, 0, MAPICON_LOCAL);
@@ -245,6 +309,17 @@ public OnPlayerConnect(playerid)
 
 public OnPlayerDisconnect(playerid, reason)
 {
+	/* track players */
+	new playerindex = binarySearch(players, MAX_PLAYERS, playerid);
+	if (playerindex == -1) {
+		print("[ERROR] binarySearch failed");
+	} else {
+		players[playerindex] = MAX_PLAYERS;
+	}
+	connectedPlayers--;
+	quickSortAsc(players, 0, maxPlayersRight);
+	printf("removed player: %i from index %i, %i players remaining", playerid, playerindex, connectedPlayers);
+	/* track players */
 
 	return 1;
 }
@@ -443,18 +518,19 @@ public OnPlayerInteriorChange(playerid, newinteriorid, oldinteriorid)
 
 public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 {
+	lastPlayerKey[playerid] = newkeys;
 	if(newkeys == KEY_YES)
 	{
 		//{"food","drink","pee","poo","energy","hygiene"};
        	if(IsPlayerInRangeOfPoint(playerid, 0.5, 258.7220,-41.7669,1002.0333))
 	    {
-            playerNeeds[playerid][4] += 10.0;
+            playerNeeds[playerid][5] += 10.0;
             playerNeeds[playerid][1] += 25.0;
             SendClientMessage(playerid, -1, "hygiene+\ndrink+");
 	    }
 	    else if(IsPlayerInRangeOfPoint(playerid, 0.5, 257.7963,-39.9567,1002.0333))
 	    {
-            playerNeeds[playerid][4] += 100.0;
+            playerNeeds[playerid][5] += 100.0;
             SendClientMessage(playerid, -1, "hygiene++");
 	    }
 	    else if(IsPlayerInRangeOfPoint(playerid, 0.5,  254.8486,-39.8989,1002.0333))
@@ -465,7 +541,6 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 	    }
 	    SendClientMessage(playerid, -1, "kry press");
 	}
-
 
 	return 1;
 }

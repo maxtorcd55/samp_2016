@@ -13,9 +13,9 @@ public createSpeedoMeter(playerid) {
 }
 
 
-/*Thread*/
-forward SpeedoUpdate(playerid);
-public SpeedoUpdate(playerid)
+/*timer*/
+forward speedoUpdate(playerid);
+public speedoUpdate(playerid)
 {
     new Float:speed_x, Float:speed_y, Float:speed_z;
     if(IsPlayerInAnyVehicle(playerid)) {
