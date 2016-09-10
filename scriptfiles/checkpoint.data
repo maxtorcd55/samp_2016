@@ -1,2 +1,6 @@
 SetPlayerMapIcon(playerid, 0, 2227.158203, 1840.395751, 10.820312, 31, 0, MAPICON_LOCAL);
 SetPlayerMapIcon(playerid, 0, 2818.569091, 2142.343017, 14.240064, 31, 0, MAPICON_LOCAL);
+SetPlayerMapIcon(playerid, 0, 2029.763793, 1345.731933, 10.820312, 31, 0, MAPICON_LOCAL);//map
+SetPlayerMapIcon(playerid, 0, 927.419372, 2007.497680, 11.460937, 31, 0, MAPICON_LOCAL);//huis
+SetPlayerMapIcon(playerid, 0, 927.359741, 2006.507080, 11.460937, 31, 0, MAPICON_LOCAL);//house_w_giant_airco
+SetPlayerMapIcon(playerid, 0, -368.495910, 1168.395629, 20.271875, 31, 0, MAPICON_LOCAL);//huis11

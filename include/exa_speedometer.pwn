@@ -34,8 +34,9 @@ forward updateSpeedometer();
 public updateSpeedometer() {
 	if (connectedPlayers > 0) {
 		static playerindex = 0;
-		if (playerindex > connectedPlayers - 1) { // index higher than connected players -> reset
+		if (playerindex >= connectedPlayers) { // index higher than connected players -> reset
 			playerindex = 0;
+			updatePlayerSpeedometer(players[playerindex]);
 		} else {
 			updatePlayerSpeedometer(players[playerindex]);
 			playerindex++;
@@ -44,7 +45,7 @@ public updateSpeedometer() {
 	} else {
 		SetTimer("updateSpeedometer", 1000, false); // no players wait 1 second
 	}
-	return 1;
+
 }
 
 createSpeedometerTimer() {

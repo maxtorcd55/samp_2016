@@ -1,6 +1,5 @@
 
 new Float:mapIcons[100][5];
-new ActivePlayerNeeds = 0; //Welk ply id er wordt verwwerkt
 new Float:playerNeeds[MAX_PLAYERS][6]; //Behoeftes van player
 new PlayerText:needShow[6][3][10]; //Textdraws van Behoeftes
 new toggleNeedsTextDraw[MAX_PLAYERS]; //Aan,uit zetten Behoeftes textdraw
@@ -37,20 +36,14 @@ public needs_OnGameModeInit() {
 	CreateObject(2707, 259.25601, -41.019, 1004.321, 0, 0, 0);//object (CJ_LIGHT_FIT) (1)
 	CreateObject(2707, 259.25601, -42.64, 1004.321, 0, 0, 0);//object (CJ_LIGHT_FIT) (2)
 	CreateObject(2818, 256.96201, -40.896, 1001.033, 0, 0, 0);//object (gb_bedrug02) (1)
-	SetTimer("needsTimer", 300, true);
+	SetTimer("needsTimer", 300, false);
 	return 1;
 }
 
 
-/*timer*/
 
-forward needsTimer();
-public needsTimer()
+updateNeeds(plyid)
 {
-
-	new plyid = ActivePlayerNeeds;
-	ActivePlayerNeeds++;
-	if(ActivePlayerNeeds > 5){ActivePlayerNeeds = 0;}
 	new playerState = GetPlayerState(plyid);
 	if(IsPlayerConnected(plyid) && (playerState == 1 || playerState == 2 || playerState == 3))//Is player connected and onfoot,driver,PASSENGER
 	{
@@ -154,19 +147,47 @@ public needsTimer()
 
 }
 
+
+/*timer*/
+
+forward needsTimer();
+public needsTimer()
+{
+	if (connectedPlayers > 0)
+	{
+		static playerindex = 0;
+		if (playerindex >= connectedPlayers)
+		{ // index higher than connected players -> reset
+			playerindex = 0;
+			updateNeeds(players[playerindex]);
+		}
+		else
+		{
+			playerindex++;
+			updateNeeds(players[playerindex]);
+		}
+		SetTimer("needsTimer", 1000/connectedPlayers, false);
+	}
+	else
+	{
+		SetTimer("needsTimer", 5000, false);
+	}
+
+}
+
 forward needs_OnPlayerConnect(playerid);
 public needs_OnPlayerConnect(playerid)
 {
 	toggleNeedsTextDraw[playerid] = 1;
     resetNeeds(playerid);
-	SetPlayerMapIcon(playerid, 0, 2816.40625, 2132.8125, 0, 31, 0, MAPICON_LOCAL);
-	SetPlayerMapIcon(playerid, 1, 2367.1875, 2160.15625, 0, 31, 0, MAPICON_LOCAL);
-	SetPlayerMapIcon(playerid, 2, 2214.84375, 1837.890625, 0, 31, 0, MAPICON_LOCAL);
-	SetPlayerMapIcon(playerid, 3, 1962.890625, 1623.046875, 0, 31, 0, MAPICON_LOCAL);
-	SetPlayerMapIcon(playerid, 4, 2248.046875, 1289.0625, 0, 31, 0, MAPICON_LOCAL);
-	SetPlayerMapIcon(playerid, 5, 2453.125, 687.5, 0, 31, 0, MAPICON_LOCAL);
-	SetPlayerMapIcon(playerid, 6, 1404.296875, 1884.765625, 0, 31, 0, MAPICON_LOCAL);
-	SetPlayerMapIcon(playerid, 7, -1529.296875, 2656.25, 0, 31, 0, MAPICON_LOCAL);
+	SetPlayerMapIcon(playerid, 0*playerid, 2816.40625, 2132.8125, 0, 31, 0, MAPICON_LOCAL);
+	SetPlayerMapIcon(playerid, 1*playerid, 2367.1875, 2160.15625, 0, 31, 0, MAPICON_LOCAL);
+	SetPlayerMapIcon(playerid, 2*playerid, 2214.84375, 1837.890625, 0, 31, 0, MAPICON_LOCAL);
+	SetPlayerMapIcon(playerid, 3*playerid, 1962.890625, 1623.046875, 0, 31, 0, MAPICON_LOCAL);
+	SetPlayerMapIcon(playerid, 4*playerid, 2248.046875, 1289.0625, 0, 31, 0, MAPICON_LOCAL);
+	SetPlayerMapIcon(playerid, 5*playerid, 2453.125, 687.5, 0, 31, 0, MAPICON_LOCAL);
+	SetPlayerMapIcon(playerid, 6*playerid, 1404.296875, 1884.765625, 0, 31, 0, MAPICON_LOCAL);
+	SetPlayerMapIcon(playerid, 7*playerid, -1529.296875, 2656.25, 0, 31, 0, MAPICON_LOCAL);
 
 	RemoveBuildingForPlayer(playerid, 18088, 257.38281, -40.95312, 1002.9141, 1);
 	RemoveBuildingForPlayer(playerid, 2295, 259.23438, -39.74219, 1001.0234, 1);

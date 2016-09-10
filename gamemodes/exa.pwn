@@ -59,6 +59,22 @@ public OnGameModeInit()
 	}
 	fclose(mapicons);
 	*/
+	CreateObject(9116, 2067.6641, 1182.1591, 65.682, 0, 0, 0);//object (VegasEroad139) (1)
+	CreateObject(9116, 2067.6641, 982.37903, 65.682, 0, 0, 0);//object (VegasEroad139) (2)
+	CreateObject(9116, 2067.6641, 1380.979, 65.682, 0, 0, 0);//object (VegasEroad139) (3)
+	CreateObject(9116, 2067.6641, 1580.5389, 65.682, 0, 0, 0);//object (VegasEroad139) (4)
+	CreateObject(9116, 2067.6641, 1779.859, 65.682, 0, 0, 0);//object (VegasEroad139) (5)
+	CreateObject(9116, 2067.6641, 1979.319, 65.682, 0, 0, 0);//object (VegasEroad139) (6)
+	CreateObject(8048, 2033.62, 966.82202, 66.246, 0, 0, 0);//object (VegasSroad047) (1)
+	CreateObject(8048, 2033.62, 1085.922, 66.246, 0, 0, 0);//object (VegasSroad047) (2)
+	CreateObject(8048, 2033.62, 1204.812, 66.246, 0, 0, 0);//object (VegasSroad047) (3)
+	CreateObject(8048, 2033.62, 1323.882, 66.246, 0, 0, 0);//object (VegasSroad047) (4)
+	CreateObject(8048, 2033.62, 1443.092, 66.246, 0, 0, 0);//object (VegasSroad047) (5)
+	CreateObject(8048, 2033.62, 1562.552, 66.246, 0, 0, 0);//object (VegasSroad047) (6)
+	CreateObject(8048, 2033.62, 1681.582, 66.246, 0, 0, 0);//object (VegasSroad047) (7)
+	CreateObject(8048, 2033.62, 1800.042, 66.246, 0, 0, 0);//object (VegasSroad047) (8)
+	CreateObject(8048, 2033.62, 1918.582, 66.246, 0, 0, 0);//object (VegasSroad047) (9)
+	CreateObject(8048, 2033.62, 2037.722, 66.246, 0, 0, 0);//object (VegasSroad047) (10)
 	return 1;
 }
 
@@ -80,6 +96,11 @@ public OnPlayerConnect(playerid)
 	addPlayerToTracker(connectedPlayers, players);
 	createPlayerSpeedometer(playerid);
 	needs_OnPlayerConnect(playerid);
+
+
+	SetPlayerMapIcon(playerid, 41, 927.419372, 2007.497680, 11.460937, 31, 0, MAPICON_LOCAL);//huis
+	SetPlayerMapIcon(playerid, 42, 927.359741, 2006.507080, 11.460937, 31, 0, MAPICON_LOCAL);//house_w_giant_airco
+	SetPlayerMapIcon(playerid, 43, -368.495910, 1168.395629, 20.271875, 31, 0, MAPICON_LOCAL);//huis11
 	return 1;
 }
 
@@ -128,17 +149,21 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		return 1;
 	}
 
-
 	if (strcmp("/icon", cmd, true, 10) == 0)
 	{
-	    new icon;
-		if(!sscanf(params, "d" ,icon))
+	    new icon, comme[80];
+		if(!sscanf(params, "ds" ,icon,comme))
 		{
-
 			new Float:x, Float:y, Float:z;
 	    	GetPlayerPos(playerid, x, y, z);
 	    	new string[128];
-			format(string,sizeof(string),"SetPlayerMapIcon(playerid, 0, %f, %f, %f, %d, 0, MAPICON_LOCAL);\r\n",x, y, z,icon);
+			format(string,sizeof(string),"SetPlayerMapIcon(playerid, 0, %f, %f, %f, %d, 0, MAPICON_LOCAL);//%s\r\n",x, y, z,icon,comme);
+			static playerindexA = 50;
+			for(new i=0; i<MAX_PLAYERS; i++)
+			{
+				SetPlayerMapIcon(playerid, playerindexA, x, y, z, icon, 0, MAPICON_LOCAL);
+			}
+			playerindexA++;
 			new File:handle = fopen("checkpoint.data", io_append);
 			if(handle)
 			{
@@ -149,6 +174,39 @@ public OnPlayerCommandText(playerid, cmdtext[])
 			{
 				print("Failed to open file \"file.txt\".");
 			}
+		}
+		else
+		{
+			SendClientMessage(playerid,-1,"Use /icon <id> <text>");
+		}
+		return 1;
+	}
+
+	if (strcmp("/add", cmd, true, 10) == 0)
+	{
+	    new comme[80];
+		if(!sscanf(params, "s" ,comme))
+		{
+			new Float:x, Float:y, Float:z;
+			new Float:Angle;
+			GetPlayerFacingAngle(playerid, Angle);
+	    	GetPlayerPos(playerid, x, y, z);
+	    	new string[128];
+			format(string,sizeof(string),"%f, %f, %f, %f (%d)//%s\r\n",x, y, z,Angle,GetPlayerInterior(playerid),comme);
+			new File:handle = fopen("add.data", io_append);
+			if(handle)
+			{
+				fwrite(handle, string);
+				fclose(handle);
+			}
+			else
+			{
+				print("Failed to open file \"file.txt\".");
+			}
+		}
+		else
+		{
+			SendClientMessage(playerid,-1,"Use /add <action>");
 		}
 		return 1;
 	}
@@ -162,6 +220,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 	if (strcmp("/getplayerpos", cmd, true, 10) == 0)
 	{
 		new Float:x, Float:y, Float:z, string[60];
+
 		GetPlayerPos(playerid, x, y, z);
 		format(string,sizeof(string),"%f, %f, %f - %d",x, y, z,GetPlayerInterior(playerid));
 		SendClientMessage(playerid,0xFFFFFAA,string);
