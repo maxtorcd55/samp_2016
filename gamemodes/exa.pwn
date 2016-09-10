@@ -7,13 +7,13 @@
 #include <sscanf>
 #include <Thread>
 #include "../include/player_tracker.pwn"
-#include "../include/exa_speedometer.pwn"
+new connectedPlayers = 0;
+new players[MAX_PLAYERS] = {MAX_PLAYERS,...};
+
 #include "../include/quicksort.pwn"
 #include "../include/binarysearch.pwn"
 #include "../include/needs.pwn"
-
-new connectedPlayers = 0;
-new players[MAX_PLAYERS] = {MAX_PLAYERS,...};
+#include "../include/exa_speedometer.pwn"
 
 #if defined FILTERSCRIPT
 
@@ -44,6 +44,7 @@ public OnGameModeInit()
 	// Don't use these lines if it's a filterscript
 	SetGameModeText("eXa");
 	AddPlayerClass(0, 1958.3783, 1343.1572, 15.3746, 269.1425, 0, 0, 0, 0, 0, 0);
+	createSpeedometerTimer();
 	/*
 	new mapiconsData[64], mapIconIndex = 0;
 	new File:mapicons = fopen("checkpoint.data", io_read);

@@ -1,5 +1,5 @@
+/* stores ids of player textdraws */
 new PlayerText:speedometerTextDraws[MAX_PLAYERS];
-
 
 /*OnPlayerConnect*/
 createPlayerSpeedometer(playerid) {
@@ -8,13 +8,11 @@ createPlayerSpeedometer(playerid) {
 	PlayerTextDrawLetterSize(playerid, speedometerTextDraws[playerid],0.3,1.0);
 	PlayerTextDrawUseBox(playerid, speedometerTextDraws[playerid], 1);
     PlayerTextDrawBoxColor(playerid, speedometerTextDraws[playerid], 0x000000AA);
-	return 1;
 }
 
 
-/*timer*/
-forward updatePlayerSpeedometer(playerid);
-public updatePlayerSpeedometer(playerid) {
+/* local function */
+updatePlayerSpeedometer(playerid) {
     new Float:speed_x, Float:speed_y, Float:speed_z;
     if(IsPlayerInAnyVehicle(playerid)) {
     	GetVehicleVelocity(GetPlayerVehicleID(playerid), speed_x, speed_y, speed_z);
@@ -30,5 +28,25 @@ public updatePlayerSpeedometer(playerid) {
 	} else {
 	    PlayerTextDrawHide(playerid, speedometerTextDraws[playerid]);
 	}
+}
+/* local timer */
+forward updateSpeedometer();
+public updateSpeedometer() {
+	if (connectedPlayers > 0) {
+		static playerindex = 0;
+		if (playerindex > connectedPlayers - 1) { // index higher than connected players -> reset
+			playerindex = 0;
+		} else {
+			updatePlayerSpeedometer(players[playerindex]);
+			playerindex++;
+		}
+		SetTimer("updateSpeedometer", 300/connectedPlayers, false);
+	} else {
+		SetTimer("updateSpeedometer", 1000, false); // no players wait 1 second
+	}
 	return 1;
+}
+
+createSpeedometerTimer() {
+	SetTimer("updateSpeedometer", 1000, false);
 }

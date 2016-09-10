@@ -3,14 +3,12 @@ addPlayerToTracker(&numberofplayers, playerlist[MAX_PLAYERS]) {
     /* increase nuberofplayers and updates playerlist */
     numberofplayers++;
     playerlist = getAllConnectedPlayers();
-    return 1;
 }
 /* OnPlayerDisconnect */
 removePlayerFromTracker(&numberofplayers, playerlist[MAX_PLAYERS]) {
     /* decrease nuberofplayers and updates playerlist */
     numberofplayers--;
     playerlist = getAllConnectedPlayers();
-    return 1;
 }
 /* internal use */
 getAllConnectedPlayers() {
