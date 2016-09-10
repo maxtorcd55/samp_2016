@@ -115,7 +115,7 @@ public onTimer300()
 {
 	static timer300Index = 0;
 	if (IsPlayerConnected(timer300Index)) {
-		speedoUpdate(timer300Index);
+		updatePlayerSpeedometer(timer300Index);
 	}
 	if (timer300Index == maxPlayers){
 		timer300Index = 0;
@@ -317,7 +317,7 @@ public OnPlayerConnect(playerid)
 
 	}
 
-	createSpeedoMeter(playerid);
+	createPlayerSpeedometer(playerid);
 	return 1;
 }
 
