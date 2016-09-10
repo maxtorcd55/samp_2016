@@ -47,7 +47,7 @@ public OnGameModeInit()
 {
 	maxPlayers = GetMaxPlayers();
 	//xdfds
-	OnGameModeInitNeeds();
+	needs_OnGameModeInit();
 
 	// Don't use these lines if it's a filterscript
 	SetGameModeText("eXa");
@@ -108,7 +108,7 @@ public OnPlayerRequestClass(playerid, classid)
 public OnPlayerConnect(playerid)
 {
 
-	OnPlayerConnectNeeds(playerid);
+	needs_OnPlayerConnect(playerid);
 
 	/* track players */
 	players[connectedPlayers] = playerid;
@@ -142,7 +142,7 @@ public OnPlayerDisconnect(playerid, reason)
 
 public OnPlayerSpawn(playerid)
 {
-	OnPlayerSpawnNeeds(playerid);
+	needs_OnPlayerSpawn(playerid);
 	return 1;
 }
 
@@ -221,7 +221,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 
 
 
-	if(OnPlayerCommandTextNeeds(playerid, cmd, params)){return 1;}
+	if(needs_OnPlayerCommandText(playerid, cmd, params)){return 1;}
 
 
 
@@ -320,7 +320,7 @@ public OnPlayerInteriorChange(playerid, newinteriorid, oldinteriorid)
 
 public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 {
-	OnPlayerKeyStateChangeNeeds(playerid, newkeys, oldkeys);
+	needs_OnPlayerKeyStateChange(playerid, newkeys, oldkeys);
 
 	return 1;
 }
