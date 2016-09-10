@@ -19,6 +19,7 @@ new Float:playerNeeds[MAX_PLAYERS][6]; //Behoeftes van player
 new PlayerText:needShow[6][3][10]; //Textdraws van Behoeftes
 new toggleNeedsTextDraw[MAX_PLAYERS]; //Aan,uit zetten Behoeftes textdraw
 new lastPlayerKey[MAX_PLAYERS];
+new lastMoney[MAX_PLAYERS];
 
 new maxPlayers;
 new connectedPlayers = 0;
@@ -142,9 +143,9 @@ public needsTimer()
 		new Float: health=100.0;
 		GetPlayerHealth(plyid,health);
 
-	    playerNeeds[plyid][0] -= 0.3;//food
-		playerNeeds[plyid][1] -= 0.7;//drink
-		playerNeeds[plyid][2] -= 0.5;//pee
+	    playerNeeds[plyid][0] -= 0.2;//food
+		playerNeeds[plyid][1] -= 0.6;//drink
+		playerNeeds[plyid][2] -= 0.4;//pee
 		playerNeeds[plyid][3] -= 0.1;//poo
 		if(playerState == 1)//Is player onfoot
 		{
@@ -187,7 +188,20 @@ public needsTimer()
 				freeTextDraw++;
 			}
         }
-    	if(IsPlayerInRangeOfPoint(plyid, 6, 258.7220,-41.7669,1002.0333))
+
+		if(GetPlayerInterior(plyid) != 0)
+		{
+			new money = GetPlayerMoney(plyid);
+			if(lastMoney[plyid] - money >= 2)
+			{
+				playerNeeds[plyid][0] += (7*lastMoney[plyid] - money);
+				playerNeeds[plyid][1] += 100;
+			}
+			lastMoney[plyid] = money;
+		}
+
+
+    	if(GetPlayerInterior(plyid) == 14 && IsPlayerInRangeOfPoint(plyid, 6, 258.7220,-41.7669,1002.0333))
 		{
 	       	if(IsPlayerInRangeOfPoint(plyid, 0.5, 258.7220,-41.7669,1002.0333))
 		    {
@@ -363,14 +377,6 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		return 1;
 	}
 
-	if (strcmp("/playerPos", cmd, true, 10) == 0)
-	{
-		new Float:x, Float:y, Float:z, Float:a;
-    	GetPlayerPos(playerid, x, y, z);
-		GetPlayerFacingAngle(playerid, a);
-		printf("%f, %f, %f, %f, %d", x, y, z, a, GetPlayerInterior(playerid));
-		return 1;
-	}
 
 	if (strcmp("/icon", cmd, true, 10) == 0)
 	{
@@ -402,16 +408,12 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		return 1;
 	}
 
-	if (strcmp("/food", cmd, true, 10) == 0)
+	if (strcmp("/getplayerpos", cmd, true, 10) == 0)
 	{
-		playerNeeds[playerid][0] += 50.0;
-		SendClientMessage(playerid, -1, "food+");
-		return 1;
-	}
-	if (strcmp("/sleep", cmd, true, 10) == 0)
-	{
-		playerNeeds[playerid][4] += 50.0;
-		SendClientMessage(playerid, -1, "energy+");
+		new Float:x, Float:y, Float:z, string[60];
+		GetPlayerPos(playerid, x, y, z);
+		format(string,sizeof(string),"%f, %f, %f - %d",x, y, z,GetPlayerInterior(playerid));
+		SendClientMessage(playerid,0xFFFFFAA,string);
 		return 1;
 	}
 
@@ -539,7 +541,6 @@ public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
             playerNeeds[playerid][3] += 100.0;
             SendClientMessage(playerid, -1, "pee++\npoo++");
 	    }
-	    SendClientMessage(playerid, -1, "kry press");
 	}
 
 	return 1;
