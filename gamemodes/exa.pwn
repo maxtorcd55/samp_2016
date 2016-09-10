@@ -6,25 +6,20 @@
 #include <a_samp>
 #include <sscanf>
 #include <Thread>
+#include "../include/player_tracker.pwn"
 #include "../include/exa_speedometer.pwn"
 #include "../include/quicksort.pwn"
 #include "../include/binarysearch.pwn"
 #include "../include/needs.pwn"
 
-
-
-
-new maxPlayers;
 new connectedPlayers = 0;
 new players[MAX_PLAYERS] = {MAX_PLAYERS,...};
-new maxPlayersRight = MAX_PLAYERS-1;
 
 #if defined FILTERSCRIPT
 
 
 public OnFilterScriptInit()
 {
-
 	return 1;
 }
 
@@ -45,11 +40,7 @@ main()
 
 public OnGameModeInit()
 {
-	maxPlayers = GetMaxPlayers();
-	//xdfds
 	OnGameModeInitNeeds();
-
-	// Don't use these lines if it's a filterscript
 	SetGameModeText("eXa");
 	AddPlayerClass(0, 1958.3783, 1343.1572, 15.3746, 269.1425, 0, 0, 0, 0, 0, 0);
 /*
@@ -66,31 +57,8 @@ public OnGameModeInit()
 	}
 	fclose(mapicons);
 */
-
-	SetTimer("onTimer300", 300/maxPlayers, true);
-
-
-
-
 	return 1;
 }
-
-forward onTimer300();
-public onTimer300()
-{
-	static timer300Index = 0;
-	if (IsPlayerConnected(timer300Index)) {
-		updatePlayerSpeedometer(timer300Index);
-	}
-	if (timer300Index == maxPlayers){
-		timer300Index = 0;
-	} else {
-		timer300Index++;
-	}
-	return 1;
-}
-
-
 
 public OnGameModeExit()
 {
@@ -107,36 +75,15 @@ public OnPlayerRequestClass(playerid, classid)
 
 public OnPlayerConnect(playerid)
 {
-
+	addPlayerToTracker(connectedPlayers, players);
 	OnPlayerConnectNeeds(playerid);
-
-	/* track players */
-	players[connectedPlayers] = playerid;
-	connectedPlayers++;
-	quickSortAsc(players, 0, maxPlayersRight);
-	printf("added player: %i, %i players total", playerid, connectedPlayers);
-	/* track players */
-
-
-
 	createPlayerSpeedometer(playerid);
 	return 1;
 }
 
 public OnPlayerDisconnect(playerid, reason)
 {
-	/* track players */
-	new playerindex = binarySearch(players, MAX_PLAYERS, playerid);
-	if (playerindex == -1) {
-		print("[ERROR] binarySearch failed");
-	} else {
-		players[playerindex] = MAX_PLAYERS;
-	}
-	connectedPlayers--;
-	quickSortAsc(players, 0, maxPlayersRight);
-	printf("removed player: %i from index %i, %i players remaining", playerid, playerindex, connectedPlayers);
-	/* track players */
-
+	removePlayerFromTracker(connectedPlayers, players);
 	return 1;
 }
 

@@ -2,8 +2,7 @@ new PlayerText:speedometerTextDraws[MAX_PLAYERS];
 
 
 /*OnPlayerConnect*/
-forward createPlayerSpeedometer(playerid);
-public createPlayerSpeedometer(playerid) {
+createPlayerSpeedometer(playerid) {
 	speedometerTextDraws[playerid] = CreatePlayerTextDraw(playerid, 530.0, 380.0, " ");
 	PlayerTextDrawTextSize(playerid, speedometerTextDraws[playerid], 620.0, 480.0);
 	PlayerTextDrawLetterSize(playerid, speedometerTextDraws[playerid],0.3,1.0);
@@ -15,8 +14,7 @@ public createPlayerSpeedometer(playerid) {
 
 /*timer*/
 forward updatePlayerSpeedometer(playerid);
-public updatePlayerSpeedometer(playerid)
-{
+public updatePlayerSpeedometer(playerid) {
     new Float:speed_x, Float:speed_y, Float:speed_z;
     if(IsPlayerInAnyVehicle(playerid)) {
     	GetVehicleVelocity(GetPlayerVehicleID(playerid), speed_x, speed_y, speed_z);
