@@ -40,10 +40,11 @@ main()
 
 public OnGameModeInit()
 {
-	OnGameModeInitNeeds();
+	needs_OnGameModeInit();
+	// Don't use these lines if it's a filterscript
 	SetGameModeText("eXa");
 	AddPlayerClass(0, 1958.3783, 1343.1572, 15.3746, 269.1425, 0, 0, 0, 0, 0, 0);
-/*
+	/*
 	new mapiconsData[64], mapIconIndex = 0;
 	new File:mapicons = fopen("checkpoint.data", io_read);
 	while(fread(mapicons, mapiconsData))
@@ -56,7 +57,7 @@ public OnGameModeInit()
 		mapIcons[mapIconIndex][3] = floatstr(findings[5]);
 	}
 	fclose(mapicons);
-*/
+	*/
 	return 1;
 }
 
@@ -76,8 +77,8 @@ public OnPlayerRequestClass(playerid, classid)
 public OnPlayerConnect(playerid)
 {
 	addPlayerToTracker(connectedPlayers, players);
-	OnPlayerConnectNeeds(playerid);
 	createPlayerSpeedometer(playerid);
+	needs_OnPlayerConnect(playerid);
 	return 1;
 }
 
@@ -89,7 +90,7 @@ public OnPlayerDisconnect(playerid, reason)
 
 public OnPlayerSpawn(playerid)
 {
-	OnPlayerSpawnNeeds(playerid);
+	needs_OnPlayerSpawn(playerid);
 	return 1;
 }
 
@@ -165,13 +166,7 @@ public OnPlayerCommandText(playerid, cmdtext[])
 		SendClientMessage(playerid,0xFFFFFAA,string);
 		return 1;
 	}
-
-
-
-	if(OnPlayerCommandTextNeeds(playerid, cmd, params)){return 1;}
-
-
-
+	if(needs_OnPlayerCommandText(playerid, cmd, params)){return 1;}
 	return 0;
 }
 
@@ -267,8 +262,7 @@ public OnPlayerInteriorChange(playerid, newinteriorid, oldinteriorid)
 
 public OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 {
-	OnPlayerKeyStateChangeNeeds(playerid, newkeys, oldkeys);
-
+	needs_OnPlayerKeyStateChange(playerid, newkeys, oldkeys);
 	return 1;
 }
 

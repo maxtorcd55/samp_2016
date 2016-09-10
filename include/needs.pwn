@@ -10,8 +10,8 @@ new lastMoney[MAX_PLAYERS];
 
 
 
-forward OnGameModeInitNeeds();
-public OnGameModeInitNeeds() {
+forward needs_OnGameModeInit();
+public needs_OnGameModeInit() {
 	CreateObject(1567, 252.32227, -40.7998, 1001, 0, 0, 270);//object (Gen_wardrobe) (1)
 	CreateObject(2523, 254.69901, -19.715, 1001.023, 0, 0, 0);//object (CJ_B_SINK3) (1)
 	CreateObject(2518, 258.922, -21.095, 1001.023, 0, 0, 268);//object (CJ_B_SINK2) (1)
@@ -154,8 +154,8 @@ public needsTimer()
 
 }
 
-forward OnPlayerConnectNeeds(playerid);
-public OnPlayerConnectNeeds(playerid)
+forward needs_OnPlayerConnect(playerid);
+public needs_OnPlayerConnect(playerid)
 {
 	toggleNeedsTextDraw[playerid] = 1;
     resetNeeds(playerid);
@@ -213,8 +213,8 @@ public OnPlayerConnectNeeds(playerid)
 	}
 }
 
-forward OnPlayerKeyStateChangeNeeds(playerid, newkeys, oldkeys);
-public OnPlayerKeyStateChangeNeeds(playerid, newkeys, oldkeys)
+forward needs_OnPlayerKeyStateChange(playerid, newkeys, oldkeys);
+public needs_OnPlayerKeyStateChange(playerid, newkeys, oldkeys)
 {
 	lastPlayerKey[playerid] = newkeys;
 	if(newkeys == KEY_YES)
@@ -240,14 +240,14 @@ public OnPlayerKeyStateChangeNeeds(playerid, newkeys, oldkeys)
 	}
 }
 
-forward OnPlayerSpawnNeeds(playerid);
-public OnPlayerSpawnNeeds(playerid)
+forward needs_OnPlayerSpawn(playerid);
+public needs_OnPlayerSpawn(playerid)
 {
 	resetNeeds(playerid);
 }
 
-forward OnPlayerCommandTextNeeds(playerid, cmd[], params[]);
-public OnPlayerCommandTextNeeds(playerid, cmd[], params[])
+forward needs_OnPlayerCommandText(playerid, cmd[], params[]);
+public needs_OnPlayerCommandText(playerid, cmd[], params[])
 {
 
 
