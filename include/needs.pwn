@@ -166,7 +166,7 @@ public needsTimer()
 			playerindex++;
 			updateNeeds(players[playerindex]);
 		}
-		SetTimer("needsTimer", 1000/connectedPlayers, false);
+		SetTimer("needsTimer", 3000/connectedPlayers, false);
 	}
 	else
 	{

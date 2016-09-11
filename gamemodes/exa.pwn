@@ -142,10 +142,14 @@ public OnPlayerCommandText(playerid, cmdtext[])
 	sscanf(cmdtext, "ss", cmd, params);
 	if (strcmp("/car", cmd, true, 10) == 0)
 	{
-		new Float:x, Float:y, Float:z;
-    	GetPlayerPos(playerid, x, y, z);
-		new vehicleid = CreateVehicle(451, x, y+2.0, z, 0, -1, -1, 60);
-        SetVehicleHealth(vehicleid, 999999999);
+		new id;
+		if(!sscanf(params, "d" ,id))
+		{
+			new Float:x, Float:y, Float:z;
+	    	GetPlayerPos(playerid, x, y, z);
+			new vehicleid = CreateVehicle(id, x, y+2.0, z, 0, -1, -1, 60);
+	        SetVehicleHealth(vehicleid, 999999999);
+		}
 		return 1;
 	}
 
