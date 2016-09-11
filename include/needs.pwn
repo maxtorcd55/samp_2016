@@ -1,5 +1,5 @@
 
-new Float:mapIcons[100][5];
+stock Float:mapIcons[100][5]; // FIXME is nerver used
 new Float:playerNeeds[MAX_PLAYERS][6]; //Behoeftes van player
 new PlayerText:needShow[6][3][10]; //Textdraws van Behoeftes
 new toggleNeedsTextDraw[MAX_PLAYERS]; //Aan,uit zetten Behoeftes textdraw

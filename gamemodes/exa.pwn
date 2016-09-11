@@ -10,8 +10,7 @@
 new connectedPlayers = 0;
 new players[MAX_PLAYERS] = {MAX_PLAYERS,...};
 
-#include "../include/quicksort.pwn"
-#include "../include/binarysearch.pwn"
+#include "../include/lib.pwn"
 #include "../include/needs.pwn"
 #include "../include/exa_speedometer.pwn"
 
@@ -368,71 +367,4 @@ public OnDialogResponse(playerid, dialogid, response, listitem, inputtext[])
 public OnPlayerClickPlayer(playerid, clickedplayerid, source)
 {
 	return 1;
-}
-
-
-
-
-stock split(string[],array[10][64])
-{
-	new i = 0, index = 0;
-	while (i < strlen(string) && i >= 0)
-	{
-	    new find[64];
-	    i = token_by_delim(string,find,',',i+1);
-	    array[index] = find;
-	    index ++;
-	}
-}
-
-stock string_replace(string[], find, replace)
-{
-    for(new i=0; string[i]; i++)
-    {
-        if(string[i] == find)
-        {
-            string[i] = replace;
-        }
-    }
-}
-
-stock token_by_delim(const string[], return_str[], delim, start_index)
-{
-	new x=0;
-	while(string[start_index] != EOS && string[start_index] != delim) {
-	    return_str[x] = string[start_index];
-	    x++;
-	    start_index++;
-	}
-	return_str[x] = EOS;
-	if(string[start_index] == EOS) start_index = (-1);
-	return start_index;
-}
-stock IsNumeric(const string[]) //By Jan "DracoBlue" Schï¿½tze (edited by Gabriel "Larcius" Cordes
-{
-	new length=strlen(string);
-	if(length==0)
-	{
-		return 0;
-	}
-	for (new i=0; i<length; i++)
-	{
-		if (!((string[i] <= '9' && string[i] >= '0') || (i==0 && (string[i]=='-' || string[i]=='+'))))
-		{
-			return false;
-		}
-	}
-	return 0;
-}
-
-
-stock numberToStipes(Float: num)
-{
-	new strip[64];
-	print("ok");
-	for (new i=0; i<floatround(num, floatround_floor); i++)
-	{
-        format(strip,sizeof(strip), "%s|",strip);
-	}
-	return strip;
 }
